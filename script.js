@@ -4,7 +4,7 @@ const itemList = document.getElementById("item-list");
 const clearBtn = document.getElementById("clear");
 const itemFilter = document.getElementById("filter");
 
-function addItem(e) {
+function onAddItemSubmit(e) {
   e.preventDefault();
   const newItem = itemInput.value;
   //Validate Input
@@ -13,21 +13,29 @@ function addItem(e) {
     return;
   }
 
+  //Create Item DOM element
+  addItemToDOM(newItem);
+
+  //Add item to Local Storage
+  addItemToStorage(newItem);
+
+  checkUI();
+
+  itemInput.value = "";
+  // console.log(li);
+}
+
+function addItemToDOM(item) {
   //Create list item
   const li = document.createElement("li");
-  li.appendChild(document.createTextNode(newItem));
-  console.log(li);
+  li.appendChild(document.createTextNode(item));
+  // console.log(li);
 
   const button = createButton("remove-item btn-link text-red");
   li.appendChild(button);
 
   // Add Li to the DOM
   itemList.appendChild(li);
-
-  checkUI();
-
-  itemInput.value = "";
-  console.log(li);
 }
 
 function createButton(classes) {
@@ -42,6 +50,26 @@ function createIcon(classes) {
   const icon = document.createElement("i");
   icon.className = classes;
   return icon;
+}
+
+function addItemToStorage(item) {
+  const itemsFromStorage = getItemFromStorage();
+  //Add new item to array
+  itemsFromStorage.push(item);
+
+  //Convert to JSON string and set to local Storage
+  localStorage.setItem("items", JSON.stringify(itemsFromStorage));
+}
+
+function getItemFromStorage() {
+  let itemsFromStorage;
+  if (localStorage.getItem("items") === null) {
+    itemsFromStorage = [];
+  } else {
+    itemsFromStorage = JSON.parse(localStorage.getItem("items"));
+  }
+
+  return itemsFromStorage;
 }
 
 function removeItem(e) {
@@ -87,7 +115,7 @@ function checkUI() {
 }
 
 // Event Listeners
-itemForm.addEventListener("submit", addItem);
+itemForm.addEventListener("submit", onAddItemSubmit);
 itemList.addEventListener("click", removeItem);
 clearBtn.addEventListener("click", clearItems);
 itemFilter.addEventListener("input", filterItems);
