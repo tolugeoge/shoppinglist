@@ -4,6 +4,12 @@ const itemList = document.getElementById("item-list");
 const clearBtn = document.getElementById("clear");
 const itemFilter = document.getElementById("filter");
 
+function displayItems() {
+  const itemsFromStorage = getItemFromStorage();
+  itemsFromStorage.forEach((item) => addItemToDOM(item));
+  checkUI();
+}
+
 function onAddItemSubmit(e) {
   e.preventDefault();
   const newItem = itemInput.value;
@@ -72,13 +78,32 @@ function getItemFromStorage() {
   return itemsFromStorage;
 }
 
-function removeItem(e) {
+function onClickItem(e) {
   if (e.target.parentElement.classList.contains("remove-item")) {
-    if (confirm("Are you sure")) {
-      e.target.parentElement.parentElement.remove();
-      checkUI();
-    }
+    removeItem(e.target.parentElement.parentElement);
   }
+}
+
+function removeItem(item) {
+  if (confirm("Are you sure?")) {
+    //Remove item from DOM
+    item.remove();
+
+    //Remove item from storage
+    removeItemFromStorage(item.textContent);
+
+    checkUI();
+  }
+}
+
+function removeItemFromStorage(item) {
+  const itemsFromStorage = getItemFromStorage();
+
+  //Filter out item to be removed
+  itemsFromStorage = itemsFromStorage.filter((i) => i !== item);
+
+  //Re-set to localstorage
+  localStorage.setItem("items", JSON.stringify(itemsFromStorage));
 }
 
 function clearItems(e) {
@@ -113,11 +138,16 @@ function checkUI() {
     itemFilter.style.display = "block";
   }
 }
+// Initialize app
+function init() {
+  // Event Listeners
+  itemForm.addEventListener("submit", onAddItemSubmit);
+  itemList.addEventListener("click", onClickItem);
+  clearBtn.addEventListener("click", clearItems);
+  itemFilter.addEventListener("input", filterItems);
+  document.addEventListener("DOMContentLoaded", displayItems);
 
-// Event Listeners
-itemForm.addEventListener("submit", onAddItemSubmit);
-itemList.addEventListener("click", removeItem);
-clearBtn.addEventListener("click", clearItems);
-itemFilter.addEventListener("input", filterItems);
+  checkUI();
+}
 
-checkUI();
+init();
