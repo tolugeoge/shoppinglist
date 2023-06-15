@@ -29,6 +29,11 @@ function onAddItemSubmit(e) {
     itemToEdit.classList.remove("edit-mode");
     itemToEdit.remove();
     isEditMode = false;
+  } else {
+    if (checkIfItemExists(newItem)) {
+      alert("Item already exist!");
+      return;
+    }
   }
 
   //Create Item DOM element
@@ -98,6 +103,11 @@ function onClickItem(e) {
   }
 }
 
+function checkIfItemExists(item) {
+  const itemsFromStorage = getItemFromStorage();
+  return itemsFromStorage.include(item);
+}
+
 function setItemToEdit(item) {
   isEditMode = true;
   // item.style.color = "grey"; we cld set it 2a css-class
@@ -158,7 +168,7 @@ function filterItems(e) {
 
 function checkUI() {
   itemInput.value = "";
-  
+
   const items = itemList.querySelectorAll("li");
   if (items.length === 0) {
     clearBtn.style.display = "none";
